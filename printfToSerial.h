@@ -14,5 +14,6 @@ Library to make printf available in Arduino.
 /// @param buffer a char array where the string will be written
 /// @param bufsize size of buffer
 /// @param radix to use for the string representation
+/// @return pointer to first char of buffer
 ///
 char * ulltoa(uint64_t ll, char *buffer, const size_t bufsize, const unsigned int radix=10);
