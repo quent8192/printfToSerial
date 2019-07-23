@@ -46,7 +46,7 @@ class CircularBuffer {
             return queued;
         }
         
-        /// @brief Helper method, to print a formatted string into the buffer.
+        /// @brief prints a formatted string into the buffer.
         int printf(const char *format, ...){
             char buffer2[BUF_SIZE];
             va_list vargs;
@@ -54,6 +54,11 @@ class CircularBuffer {
             vsnprintf(buffer2, BUF_SIZE, format, vargs);
             va_end(vargs);
             return enqueueString(buffer2);
+        }
+        
+        /// @brief returns the available size in the circular bufffer.
+        int availableSize(){
+            return BUF_SIZE - ((nextI + BUF_SIZE - oldestI) % BUF_SIZE);
         }
         
     private :
