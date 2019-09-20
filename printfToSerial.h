@@ -48,12 +48,30 @@ class CircularBuffer {
         
         /// @brief Prints a formatted string into the buffer.
         int printf(const char *format, ...){
-            char buffer2[BUF_SIZE];
             va_list vargs;
             va_start(vargs, format);
-            vsnprintf(buffer2, BUF_SIZE, format, vargs);
+            int ret = this->vprintf(format, vargs);
             va_end(vargs);
+            return ret;
+        }
+        
+        /// @brief Prints a formatted string into the buffer.
+        int vprintf(const char *format, va_list ap){
+            int maxSize = availableSize();
+            char buffer2[maxSize];
+            vsnprintf(buffer2, maxSize, format, ap);
             return enqueueString(buffer2);
+        }
+        
+        /// @brief Prints a formatted string into the buffer, pre-pended with an integer (example : timestamp). Pre-pending can be disabled by enableTSPrint(bool)
+        int printf(uint32_t ts, const char *format, ...){
+            int ret = 0;
+            if ( TSPrintEnabled ) printf("%" PRIu32 " ", ts);
+            va_list vargs;
+            va_start(vargs, format);
+            ret += this->vprintf(format, vargs);
+            va_end(vargs);
+            return ret;
         }
         
         /// @brief Returns the available size in the circular bufffer.
@@ -61,10 +79,16 @@ class CircularBuffer {
             return BUF_SIZE - ((nextI + BUF_SIZE - oldestI) % BUF_SIZE);
         }
         
+        /// @brief Returns the available size in the circular bufffer.
+        void enableTSPrint(bool enable) {
+            TSPrintEnabled = enable;
+        }
+        
     private :
         int oldestI = 0;        // oldest index (next to be written on the serial port)
         int nextI = 0;          // next position to write to.
         char buffer[BUF_SIZE];  // the buffer.
+        bool TSPrintEnabled = false; // disables timestamp printing in "int printf(uint32_t, const char *, ...)"
 
 
 };
