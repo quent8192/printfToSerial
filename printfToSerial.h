@@ -33,6 +33,20 @@ class CircularBuffer {
             }
         }
         
+        /// @brief Removes chars from circular buffer, and puts them into *to
+        /// @param to : destination where to put the taken chars
+        /// @param maxSize : maximum number of chars to take
+        /// @return actual number of chars taken
+        int take(char* to, int maxSize){
+            int count = 0;
+            while (oldestI != nextI && count < maxSize ) {
+                to[count] = buffer[oldestI];
+                oldestI = (oldestI + 1)%BUF_SIZE ;
+                count++;
+            }
+            return count;
+        }
+        
         
         /// @brief Adds a string to the circular buffer, to be printed to the serial port. Will truncate the string if there is not enough space left in the buffer
         /// @param str address of a null-terminated string.
@@ -77,6 +91,11 @@ class CircularBuffer {
         /// @brief Returns the available size in the circular bufffer.
         int availableSize(){
             return BUF_SIZE - ((nextI + BUF_SIZE - oldestI) % BUF_SIZE);
+        }
+        
+        /// @brief Returns the available size in the circular bufffer.
+        int availableChars(){
+            return ((nextI + BUF_SIZE - oldestI) % BUF_SIZE);
         }
         
         /// @brief Returns the available size in the circular bufffer.
