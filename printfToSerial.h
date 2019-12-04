@@ -20,7 +20,7 @@ char * ulltoa(uint64_t ll, char *buffer, const size_t bufsize, const unsigned in
 
 template <unsigned int BUF_SIZE>
 class CircularBuffer {
-    
+
     public :
         /// @brief To be called very frequently. Will write one char to Serial if there are data in the buffer.
         void engine(){
@@ -32,8 +32,8 @@ class CircularBuffer {
                 oldestI = (oldestI + 1)%BUF_SIZE ;
             }
         }
-        
-        
+
+
         /// @brief Adds a string to the circular buffer, to be printed to the serial port. Will truncate the string if there is not enough space left in the buffer
         /// @param str address of a null-terminated string.
         int enqueueString(const char *str){
@@ -45,7 +45,7 @@ class CircularBuffer {
             }
             return queued;
         }
-        
+
         /// @brief Prints a formatted string into the buffer.
         int printf(const char *format, ...){
             char buffer2[BUF_SIZE];
@@ -55,12 +55,24 @@ class CircularBuffer {
             va_end(vargs);
             return enqueueString(buffer2);
         }
-        
+
         /// @brief Returns the available size in the circular bufffer.
         int availableSize(){
             return BUF_SIZE - ((nextI + BUF_SIZE - oldestI) % BUF_SIZE);
         }
-        
+
+        /// @brief Returns the number of characters to send
+        int charactersToSend(){
+            return (nextI + BUF_SIZE - oldestI) % BUF_SIZE;
+        }
+
+        /// @brief discards everything in the circular buffer
+        void clear(){
+            oldestI = 0;
+            nextI = 0;
+            buffer[0] = '\0';
+        }
+
     private :
         int oldestI = 0;        // oldest index (next to be written on the serial port)
         int nextI = 0;          // next position to write to.
