@@ -23,8 +23,9 @@ class CircularBuffer {
 
     public :
         /// @brief To be called very frequently. Will write one char to Serial if there are data in the buffer.
-        void engine(){
-            if (oldestI != nextI) {
+        void engine(int numToSend=1){
+            numToSend = numToSend < charactersToSend() ? numToSend : charactersToSend();
+            while (numToSend--) {
                 Serial.print(buffer[oldestI]);
                 if (buffer[oldestI] == '\n') {
                     Serial.flush();
@@ -32,6 +33,7 @@ class CircularBuffer {
                 oldestI = (oldestI + 1)%BUF_SIZE ;
             }
         }
+
         /// @brief Removes chars from circular buffer, and puts them into *to
         /// @param to : destination where to put the taken chars
         /// @param maxSize : maximum number of chars to take
@@ -111,6 +113,13 @@ class CircularBuffer {
         /// @brief Returns the available size in the circular bufffer.
         void enableTSPrint(bool enable) {
             TSPrintEnabled = enable;
+        }
+
+        void flushToSerial(){
+            while (charactersToSend()){
+                engine(64);     // 64, because it is the default output buffer size on arduino
+            }
+            Serial.flush();
         }
 
     private :
